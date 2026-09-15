@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Blue Skies - Mistura</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+  <div class="header-container">
+    <img src="img/logo.png" alt="Blue Skies Logo" class="logo-header">
+    <div class="header-texto">
+      <h1>BLUE SKIES</h1>
+      <p id="titulo-dia">O que vamos comer em...</p>
+    </div>
+  </div>
+</header>
+
+  <main>
+    <div class="grid-misturas">
+      <button id="btn-opcao-a" class="btn-mistura" onclick="selecionarMistura('A')">
+        <span>🍲</span>
+        <div id="texto-opcao-a">Carregando...</div>
+      </button>
+      <button id="btn-opcao-b" class="btn-mistura" onclick="selecionarMistura('B')">
+        <span>🍛</span>
+        <div id="texto-opcao-b">Carregando...</div>
+      </button>
+    </div>
+  </main>
+
+  <footer>
+    <p>Blue Skies Exportação de Frutas &copy; 2026</p>
+  </footer>
+
+  <!-- Pequeno ajuste no script dentro do próprio arquivo para puxar os textos corretos -->
+  <script src="js/cliente.js"></script>
+  <script>
+    if (window.location.pathname.includes('mistura.html')) {
+      document.getElementById('titulo-dia').innerText = `Cardápio de ${diaSelecionado}`;
+      fetch(`/api/cardapio/${diaSelecionado}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('texto-opcao-a').innerText = data.mistura_a || 'Opção A (Ainda não definida)';
+          document.getElementById('texto-opcao-b').innerText = data.mistura_b || 'Opção B (Ainda não definida)';
+        });
+    }
+  </script>
+</body>
+</html>

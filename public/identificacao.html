@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Blue Skies - Identificação</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+  <div class="header-container">
+    <img src="img/logo.png" alt="Blue Skies Logo" class="logo-header">
+    <div class="header-texto">
+      <h1>BLUE SKIES</h1>
+      <p>Só mais um passo para confirmar</p>
+    </div>
+  </div>
+</header>
+
+  <main>
+    <form id="form-identificacao" onsubmit="salvarEscolha(event)">
+      <div>
+        <label for="nome">Seu Nome Completo:</label>
+        <input type="text" id="nome" required placeholder="Digite seu nome..." autocomplete="off">
+      </div>
+
+      <div>
+        <label for="setor">Seu Setor:</label>
+        <select id="setor" required>
+          <option value="">Carregando setores...</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="horario">Horário da Refeição:</label>
+        <select id="horario" required>
+          <option value="">Carregando horários...</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-submit">Confirmar Pedido</button>
+    </form>
+  </main>
+
+  <footer>
+    <p>Blue Skies Exportação de Frutas &copy; 2026</p>
+  </footer>
+
+  <script src="js/cliente.js"></script>
+</body>
+</html>

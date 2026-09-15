@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Blue Skies - Refeitório</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+  <div class="header-container">
+    <img src="img/logo.png" alt="Blue Skies Logo" class="logo-header">
+    <div class="header-texto">
+      <h1>BLUE SKIES</h1>
+      <p>Agendamento Digital de Refeições</p>
+    </div>
+  </div>
+</header>
+
+  <main>
+    <div class="boas-vindas">
+      <div class="relogio" id="relogio">00:00:00</div>
+      <div class="data-atual" id="data-atual">Carregando data...</div>
+      <p style="margin-top: 15px; font-size: 1.1rem;">Selecione o dia da semana abaixo para escolher sua mistura:</p>
+    </div>
+
+    <div class="grid-dias">
+      <a href="mistura.html?dia=Segunda" class="btn-dia"><span>📅</span> Segunda</a>
+      <a href="mistura.html?dia=Terca" class="btn-dia"><span>📅</span> Terça</a>
+      <a href="mistura.html?dia=Quarta" class="btn-dia"><span>📅</span> Quarta</a>
+      <a href="mistura.html?dia=Quinta" class="btn-dia"><span>📅</span> Quinta</a>
+      <a href="mistura.html?dia=Sexta" class="btn-dia"><span>📅</span> Sexta</a>
+      <a href="mistura.html?dia=Sabado" class="btn-dia"><span>📅</span> Sábado</a>
+      <a href="mistura.html?dia=Domingo" class="btn-dia"><span>📅</span> Domingo</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>Blue Skies Exportação de Frutas &copy; 2026</p>
+  </footer>
+
+  <script>
+    function atualizarRelogio() {
+      const agora = new Date();
+      document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR');
+      document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
+  </script>
+</body>
+</html>

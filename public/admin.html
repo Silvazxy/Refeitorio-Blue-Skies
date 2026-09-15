@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Blue Skies - Painel da Cozinha</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+  <div class="header-container">
+    <img src="img/logo.png" alt="Blue Skies Logo" class="logo-header">
+    <div class="header-texto">
+      <h1>PAINEL DA COZINHA</h1>
+      <p>Gerencie o cardápio e os relatórios</p>
+    </div>
+  </div>
+</header>
+
+  <main>
+    <div class="admin-container">
+      <div class="abas">
+        <div class="aba ativa" onclick="mudarAba('aba-cardapio', this)">Cadastrar Misturas</div>
+        <div class="aba" onclick="mudarAba('aba-relatorios', this)">Ver Relatórios</div>
+      </div>
+
+      <!-- ABA 1: CARDÁPIO -->
+      <div id="aba-cardapio" class="conteudo-aba ativa">
+        <h2 style="margin-bottom: 20px; color: var(--azul-escuro);">Definir Misturas da Semana</h2>
+        
+        <label>Escolha o Dia:</label>
+        <select id="admin-dia" style="margin-bottom: 20px; padding: 15px; width: 100%; font-size:1.1rem; border: 1px solid #ccc; border-radius: 8px;" onchange="carregarCardapioAdmin()">
+          <option value="Segunda">Segunda-feira</option>
+          <option value="Terca">Terça-feira</option>
+          <option value="Quarta">Quarta-feira</option>
+          <option value="Quinta">Quinta-feira</option>
+          <option value="Sexta">Sexta-feira</option>
+          <option value="Sabado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+        </select>
+
+        <label>Nome da Mistura A:</label>
+        <input type="text" id="admin-mistura-a" placeholder="Ex: Strogonoff de Frango" style="margin-bottom: 20px; padding: 15px; width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+
+        <label>Nome da Mistura B:</label>
+        <input type="text" id="admin-mistura-b" placeholder="Ex: Peixe Assado" style="margin-bottom: 20px; padding: 15px; width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+
+        <button class="btn-admin" onclick="salvarCardapio()">Salvar Misturas do Dia</button>
+        <button class="btn-danger" onclick="limparCardapio()">Limpar este Dia (Resetar)</button>
+      </div>
+
+      <!-- ABA 2: RELATÓRIOS LADO A LADO -->
+      <div id="aba-relatorios" class="conteudo-aba">
+        <h2 style="margin-bottom: 20px; color: var(--azul-escuro);">Lista de Almoço/Janta</h2>
+        
+        <label>Ver relatório de qual dia?</label>
+        <select id="relatorio-dia" style="margin-bottom: 20px; padding: 15px; width: 100%; font-size:1.1rem; border: 1px solid #ccc; border-radius: 8px;" onchange="gerarRelatorio()">
+          <option value="Segunda">Segunda-feira</option>
+          <option value="Terca">Terça-feira</option>
+          <option value="Quarta">Quarta-feira</option>
+          <option value="Quinta">Quinta-feira</option>
+          <option value="Sexta">Sexta-feira</option>
+          <option value="Sabado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+        </select>
+
+        <div class="export-botoes">
+          <button class="btn-export bg-excel" onclick="exportarExcel()">Baixar Excel</button>
+          <button class="btn-export bg-pdf" onclick="window.print()">Imprimir / Salvar PDF</button>
+        </div>
+
+        <!-- Onde as tabelas vão aparecer via JS -->
+        <div id="area-tabelas"></div>
+
+        <!-- BOTÃO DE RESET DOS FUNCIONÁRIOS -->
+        <button class="btn-danger" style="margin-bottom: 20px;" onclick="limparRegistrosDoDia()">Limpar Pedidos deste Dia</button>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

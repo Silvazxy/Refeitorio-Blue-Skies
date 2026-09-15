@@ -1,0 +1,376 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --azul-escuro: #004e89;
+  --azul-ceu: #00a8e8;
+  --azul-hover: #00335e;
+  --azul-suave: #e6f4fc;
+  --fundo: #edf2f7;
+  --texto: #2b2d42;
+  --branco: #ffffff;
+  --cinza-borda: #cbd5e1;
+}
+
+* { 
+  box-sizing: border-box; 
+  font-family: 'Poppins', sans-serif; 
+  margin: 0; 
+  padding: 0; 
+}
+
+body { 
+  background-color: var(--fundo); 
+  color: var(--texto); 
+  display: flex; 
+  flex-direction: column; 
+  min-height: 100vh; 
+}
+
+/* ==========================================================================
+   1. DESKTOP PADRÃO (PC - Telas Grandes >= 1024px)
+   ========================================================================== */
+
+header {
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul-ceu));
+  color: var(--branco);
+  padding: 15px 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.logo-header {
+  grid-column: 1;
+  height: 65px;
+  width: auto;
+  justify-self: start;
+}
+
+.header-texto {
+  grid-column: 2;
+  text-align: center;
+}
+
+header h1 { 
+  font-size: 2rem; 
+  font-weight: 800; 
+  letter-spacing: 1.5px; 
+  text-transform: uppercase; 
+}
+
+header p { 
+  font-size: 0.95rem; 
+  opacity: 0.9; 
+  margin-top: 2px; 
+}
+
+footer { 
+  background-color: var(--texto); 
+  color: var(--branco); 
+  text-align: center; 
+  padding: 14px; 
+  margin-top: auto; 
+  font-size: 0.85rem; 
+}
+
+/* CONTAINER PRINCIPAL: Centralização Vertical e Horizontal */
+main { 
+  flex: 1; 
+  padding: 40px 20px; 
+  max-width: 1100px; 
+  margin: 0 auto; 
+  width: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+}
+
+/* Relógio e Boas-Vindas */
+.boas-vindas { 
+  text-align: center; 
+  margin-bottom: 30px; 
+  background: var(--branco); 
+  padding: 40px 30px; 
+  border-radius: 18px; 
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
+  width: 100%; 
+}
+
+.relogio { 
+  font-size: 4.5rem; 
+  font-weight: 800; 
+  color: var(--azul-escuro); 
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.data-atual { 
+  font-size: 1.25rem; 
+  color: #64748b; 
+  margin-top: 8px; 
+  font-weight: 500;
+}
+
+/* Grid de Dias */
+.grid-dias { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 18px; 
+  width: 100%; 
+}
+
+.btn-dia { 
+  background-color: var(--branco); 
+  color: var(--azul-escuro); 
+  border: 2px solid var(--cinza-borda); 
+  padding: 24px 15px; 
+  font-size: 1.25rem; 
+  font-weight: 700; 
+  border-radius: 16px; 
+  cursor: pointer; 
+  text-align: center; 
+  text-decoration: none; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+  transition: all 0.25s ease; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+  gap: 10px; 
+}
+.btn-dia span { font-size: 2.5rem; }
+.btn-dia:hover, .btn-dia:active { 
+  background-color: var(--azul-escuro); 
+  color: var(--branco); 
+  border-color: var(--azul-escuro);
+  transform: translateY(-4px); 
+  box-shadow: 0 8px 20px rgba(0, 78, 137, 0.2); 
+}
+
+/* Tela de Misturas (Opção A / Opção B) - Centralizada */
+.grid-misturas { 
+  display: flex; 
+  flex-direction: row;
+  gap: 25px; 
+  width: 100%; 
+  max-width: 900px; /* Limita a largura para ficarem bem proporcionais e centralizadas */
+  margin: 0 auto;
+  justify-content: center; 
+  align-items: stretch;
+}
+
+.btn-mistura {
+  flex: 1;
+  min-height: 250px; /* Um pouco mais alto para ficar imponente no centro */
+  background: var(--branco);
+  color: var(--azul-escuro);
+  border: 3px solid var(--azul-escuro);
+  font-size: 1.8rem; /* Fonte aumentada */
+  font-weight: 700;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 78, 137, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  text-align: center;
+}
+.btn-mistura span { font-size: 4rem; margin-bottom: 12px; }
+.btn-mistura:hover, .btn-mistura:active { 
+  background: var(--azul-escuro);
+  color: var(--branco);
+  transform: translateY(-5px); 
+}
+
+/* Formulário PC */
+form { 
+  width: 100%; 
+  max-width: 650px; 
+  background: var(--branco); 
+  padding: 40px 35px; 
+  border-radius: 20px; 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
+  display: flex; 
+  flex-direction: column; 
+  gap: 25px; 
+  margin: auto 0; /* Ajuda a forçar o centro se precisar */
+}
+
+label { 
+  font-weight: 700; 
+  font-size: 1.25rem; 
+  color: var(--azul-escuro); 
+  margin-bottom: 6px; 
+  display: block; 
+}
+
+input, select {
+  padding: 18px; 
+  font-size: 1.2rem;
+  border: 2px solid var(--cinza-borda);
+  border-radius: 14px;
+  width: 100%;
+  background-color: #f8fafc;
+  transition: border-color 0.3s;
+  outline: none;
+}
+input:focus, select:focus { border-color: var(--azul-ceu); background-color: var(--branco); }
+
+.btn-submit, .btn-admin { 
+  background: var(--azul-escuro); 
+  color: var(--branco); 
+  border: none; 
+  padding: 20px; 
+  font-size: 1.35rem; 
+  font-weight: 700; 
+  border-radius: 14px; 
+  cursor: pointer; 
+  transition: all 0.3s; 
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0, 78, 137, 0.2);
+}
+.btn-submit:hover, .btn-admin:hover { background: var(--azul-hover); transform: translateY(-2px); }
+
+.btn-danger { background: #ef4444; color: white; border: none; padding: 18px; border-radius: 14px; cursor: pointer; font-size: 1.2rem; font-weight: 700; width: 100%; margin-top: 10px; transition: 0.3s; }
+.btn-danger:hover { background: #dc2626; }
+
+/* Admin Panel */
+.admin-container { 
+  width: 100%; 
+  background: var(--branco); 
+  border-radius: 20px; 
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
+  overflow: hidden; 
+}
+.abas { display: flex; background: #e2e8f0; }
+.aba { flex: 1; padding: 20px; text-align: center; font-weight: 700; font-size: 1.2rem; cursor: pointer; color: #64748b; transition: 0.3s; }
+.aba.ativa { background: var(--branco); color: var(--azul-escuro); border-bottom: 4px solid var(--azul-escuro); }
+.conteudo-aba { padding: 35px; display: none; }
+.conteudo-aba.ativa { display: block; }
+
+.bloco-horario { margin-bottom: 30px; border: 2px solid var(--cinza-borda); border-radius: 16px; padding: 25px; background: #f8fafc; }
+.titulo-horario { text-align: center; font-size: 1.6rem; color: var(--azul-escuro); margin-bottom: 20px; font-weight: 700; border-bottom: 2px dashed var(--cinza-borda); padding-bottom: 12px;}
+.duas-colunas { display: flex; gap: 25px; }
+.coluna-mistura { flex: 1; background: var(--branco); border: 1px solid var(--cinza-borda); border-radius: 14px; overflow-x: auto; }
+.header-mistura { background: var(--azul-suave); padding: 16px; text-align: center; font-weight: 700; font-size: 1.15rem; color: var(--azul-escuro); border-bottom: 1px solid var(--cinza-borda); }
+table { width: 100%; border-collapse: collapse; min-width: 280px; }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 1.05rem; }
+th { background: #f8fafc; color: #475569; font-size: 0.95rem; text-transform: uppercase; }
+
+.export-botoes { display: flex; gap: 15px; margin-bottom: 20px; }
+.btn-export { flex: 1; padding: 18px; font-weight: 700; font-size: 1.1rem; border-radius: 12px; cursor: pointer; border: none; color: white;}
+.bg-excel { background-color: #16a34a; }
+.bg-pdf { background-color: #dc2626; }
+
+
+/* ==========================================================================
+   2. REGRAS EXCLUSIVAS PARA TABLET (768px até 1023px)
+   ========================================================================== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+  }
+  .logo-header { height: 70px; }
+  .header-texto { text-align: right; }
+  
+  main { max-width: 100%; padding: 40px 20px; }
+
+  /* NOVO: Misturas empilhadas no Tablet */
+  .grid-misturas { 
+    flex-direction: column; /* Uma embaixo da outra */
+    max-width: 700px; /* Largura controlada para não esticar demais no tablet */
+  }
+  
+  .btn-mistura {
+    width: 100%;
+    min-height: 220px;
+  }
+  
+  form { 
+    max-width: 95%; 
+    padding: 50px 40px; 
+    gap: 30px; 
+    border-radius: 24px;
+  }
+  
+  label { font-size: 1.45rem; }
+  
+  input, select { 
+    padding: 24px; 
+    font-size: 1.35rem; 
+    border-radius: 16px; 
+    height: 75px; 
+  }
+  
+  .btn-submit, .btn-admin, .btn-danger { 
+    padding: 26px; 
+    font-size: 1.55rem; 
+    border-radius: 16px;
+  }
+  
+  .boas-vindas { padding: 50px 25px; }
+  .relogio { font-size: 5.5rem; }
+  .grid-dias { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .btn-dia { padding: 30px 15px; font-size: 1.4rem; }
+  .btn-dia span { font-size: 3rem;}
+  
+  .conteudo-aba { padding: 30px 20px; }
+  .aba { padding: 22px; font-size: 1.35rem; }
+  .duas-colunas { flex-direction: column; gap: 20px; } 
+  .bloco-horario { padding: 20px; }
+  .titulo-horario { font-size: 1.8rem; }
+  .btn-export { padding: 22px; font-size: 1.3rem; }
+}
+
+
+/* ==========================================================================
+   3. REGRAS EXCLUSIVAS PARA CELULAR (Abaixo de 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .header-container { display: flex; flex-direction: column; text-align: center; gap: 8px; }
+  .logo-header { height: 60px; align-self: center; }
+  .header-texto { text-align: center; }
+  header h1 { font-size: 1.6rem; }
+  header p { font-size: 0.9rem; }
+
+  main { padding: 20px 15px; }
+  .boas-vindas { padding: 25px 15px; margin-bottom: 20px; }
+  .relogio { font-size: 3rem; }
+  .data-atual { font-size: 1rem; }
+
+  .grid-dias { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .btn-dia { padding: 18px 10px; font-size: 1.1rem; border-radius: 12px; }
+  .btn-dia span { font-size: 1.8rem; }
+
+  .grid-misturas { flex-direction: column; gap: 15px; }
+  .btn-mistura { width: 100%; min-height: 180px; font-size: 1.4rem; padding: 20px; }
+  .btn-mistura span { font-size: 3.2rem; margin-bottom: 8px; }
+
+  form { max-width: 100%; padding: 25px 18px; gap: 20px; border-radius: 18px; }
+  label { font-size: 1.15rem; }
+  input, select { padding: 16px; font-size: 1.1rem; height: 60px;}
+  .btn-submit { padding: 18px; font-size: 1.25rem; }
+
+  .abas { overflow-x: auto; white-space: nowrap; }
+  .aba { padding: 16px 20px; font-size: 1.1rem; flex: none; }
+  .conteudo-aba { padding: 18px 12px; }
+  .bloco-horario { padding: 15px 12px; margin-bottom: 20px; }
+  .titulo-horario { font-size: 1.4rem; margin-bottom: 15px; }
+  .duas-colunas { flex-direction: column; gap: 15px; }
+  .coluna-mistura { overflow-x: auto; } 
+  th, td { padding: 12px 10px; font-size: 0.9rem; }
+  .export-botoes { flex-direction: column; gap: 12px; }
+  .btn-export, .btn-danger { padding: 16px; font-size: 1.1rem; }
+}
