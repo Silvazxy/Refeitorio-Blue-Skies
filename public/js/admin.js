@@ -100,7 +100,7 @@ async function gerarRelatorio() {
 
     htmlFinal += `
       <div class="bloco-horario" id="tabela-excel-${horario}">
-        <div class="titulo-horario">⏰ HORÁRIO: ${horario}</div>
+        <div class="titulo-horario">HORÁRIO: ${horario}</div>
         <div class="duas-colunas">
           <!-- CAIXA MISTURA A -->
           <div class="coluna-mistura">
@@ -136,13 +136,87 @@ async function gerarRelatorio() {
   }
 }
 
-// Exportar para Excel (.xls)
-function exportarExcel() {
+
+// Exportar para Excel
+async function exportarExcel() {
   const dia = document.getElementById('relatorio-dia').value;
-  let excelFormat = `<html xmlns:x="urn:schemas-microsoft-com:office:excel">
-    <head><meta charset="utf-8"></head><body>`;
-  excelFormat += document.getElementById('area-tabelas').innerHTML;
-  excelFormat += `</body></html>`;
+  
+  // 1. Busca os dados novamente para ter certeza que está atualizado
+  const resNomes = await fetch(`/api/relatorio/${dia}`);
+  const escolhas = await resNomes.json();
+  
+  const resCardapio = await fetch(`/api/cardapio/${dia}`);
+  const cardapio = await resCardapio.json();
+  
+  const nomeMisturaA = cardapio.mistura_a || 'Mistura A';
+  const nomeMisturaB = cardapio.mistura_b || 'Mistura B';
+
+  if (escolhas.length === 0) {
+    alert("Nenhum pedido para exportar neste dia.");
+    return;
+  }
+
+  // 2. Monta a tabela em formato "puro" que o Excel adora
+  let tabelaHTML = `
+    <table border="1">
+      <thead>
+        <tr>
+          <th colspan="3" style="font-size: 18px; font-weight: bold; background-color: #d9e1f2;">Relatório de Pedidos - ${dia}</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  // 3. Agrupa por Horário para separar bonitinho
+  const porHorario = {};
+  escolhas.forEach(esc => {
+    if (!porHorario[esc.horario]) porHorario[esc.horario] = [];
+    porHorario[esc.horario].push(esc);
+  });
+
+  // 4. Preenche as linhas da tabela separando pelos horários
+  for (const horario in porHorario) {
+    // Linha de Cabeçalho do Horário
+    tabelaHTML += `
+      <tr>
+        <th colspan="3" style="background-color: #c6e0b4; font-weight: bold;">⏰ HORÁRIO: ${horario}</th>
+      </tr>
+      <tr>
+        <th style="background-color: #f2f2f2;">Nome</th>
+        <th style="background-color: #f2f2f2;">Setor</th>
+        <th style="background-color: #f2f2f2;">Mistura Escolhida</th>
+      </tr>
+    `;
+
+    // Linhas dos funcionários
+    porHorario[horario].forEach(pessoa => {
+      const nomeMistura = pessoa.opcao_mistura === 'A' ? nomeMisturaA : nomeMisturaB;
+      tabelaHTML += `
+        <tr>
+          <td>${pessoa.nome_colaborador}</td>
+          <td>${pessoa.setor}</td>
+          <td>${nomeMistura}</td>
+        </tr>
+      `;
+    });
+    
+    // Linha em branco para dar um respiro visual entre os horários
+    tabelaHTML += `<tr><td colspan="3"></td></tr>`;
+  }
+
+  tabelaHTML += `</tbody></table>`;
+
+  // 5. Monta o arquivo e força o download
+  const excelFormat = `
+    <html xmlns:x="urn:schemas-microsoft-com:office:excel">
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        ${tabelaHTML}
+      </body>
+    </html>
+  `;
 
   const blob = new Blob([excelFormat], { type: 'application/vnd.ms-excel' });
   const url = URL.createObjectURL(blob);
