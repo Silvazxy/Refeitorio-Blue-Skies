@@ -1,160 +1,151 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const mongoose = require('mongoose');
 const path = require('path');
-const fs = require('fs');
+require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
-
-const dbFolder = path.join(__dirname, 'database');
-if (!fs.existsSync(dbFolder)) {
-  fs.mkdirSync(dbFolder);
-}
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const dbPath = path.join(dbFolder, 'refeitorio.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Erro ao conectar ao SQLite:', err.message);
-  } else {
-    console.log('Conectado ao banco de dados SQLite com sucesso.');
-    inicializarBanco();
-  }
+// CONEXÃO COM O MONGODB
+const mongoURI = process.env.MONGO_URI; 
+mongoose.connect(mongoURI)
+  .then(() => {
+    console.log('Conectado ao MongoDB com sucesso!');
+    inicializarDados();
+  })
+  .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
+
+// SCHEMAS (Estrutura do Banco)
+const SetorSchema = new mongoose.Schema({ nome: String });
+const Setor = mongoose.model('Setor', SetorSchema);
+
+const HorarioSchema = new mongoose.Schema({ horario: String });
+const Horario = mongoose.model('Horario', HorarioSchema);
+
+const CardapioSchema = new mongoose.Schema({
+  dia_semana: { type: String, unique: true },
+  mistura_a: String,
+  mistura_b: String
 });
+const Cardapio = mongoose.model('Cardapio', CardapioSchema);
 
-function inicializarBanco() {
-  db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS setores (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL)`);
+const EscolhaSchema = new mongoose.Schema({
+  data: String,
+  dia_semana: String,
+  nome_colaborador: String,
+  setor_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Setor' },
+  horario_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Horario' },
+  opcao_mistura: String,
+  criado_em: { type: Date, default: Date.now }
+});
+const Escolha = mongoose.model('Escolha', EscolhaSchema);
 
-    db.get(`SELECT COUNT(*) as total FROM setores`, (err, row) => {
-      if (row && row.total === 0) {
-        const setoresIniciais = ['Embalagem de Manga', 'Campo / Colheita', 'Qualidade', 'Controladoria', 'RH', 'Financeiro'];
-        const stmt = db.prepare(`INSERT INTO setores (nome) VALUES (?)`);
-        setoresIniciais.forEach(s => stmt.run(s));
-        stmt.finalize();
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, horario TEXT NOT NULL)`);
-
-    db.get(`SELECT COUNT(*) as total FROM horarios`, (err, row) => {
-      if (row && row.total === 0) {
-        const horariosIniciais = ['11:30', '11:50', '12:10', '12:30', '18:00', '18:30'];
-        const stmt = db.prepare(`INSERT INTO horarios (horario) VALUES (?)`);
-        horariosIniciais.forEach(h => stmt.run(h));
-        stmt.finalize();
-      }
-    });
-
-    db.run(`CREATE TABLE IF NOT EXISTS cardapios (id INTEGER PRIMARY KEY AUTOINCREMENT, dia_semana TEXT NOT NULL UNIQUE, mistura_a TEXT, mistura_b TEXT)`);
-
-    db.run(`CREATE TABLE IF NOT EXISTS escolhas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      data TEXT NOT NULL,
-      dia_semana TEXT NOT NULL,
-      nome_colaborador TEXT NOT NULL,
-      setor_id INTEGER,
-      horario_id INTEGER,
-      opcao_mistura TEXT NOT NULL,
-      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (setor_id) REFERENCES setores(id),
-      FOREIGN KEY (horario_id) REFERENCES horarios(id)
-    )`);
-  });
+// INICIALIZAR DADOS PADRÃO (Se não existirem)
+async function inicializarDados() {
+  const setores = await Setor.countDocuments();
+  if (setores === 0) {
+    await Setor.insertMany([
+      { nome: 'Embalagem de Manga' }, { nome: 'Campo / Colheita' },
+      { nome: 'Qualidade' }, { nome: 'Controladoria' }, { nome: 'RH' }, { nome: 'Financeiro' }
+    ]);
+  }
+  const horarios = await Horario.countDocuments();
+  if (horarios === 0) {
+    await Horario.insertMany([
+      { horario: '11:30' }, { horario: '11:50' }, { horario: '12:10' },
+      { horario: '12:30' }, { horario: '18:00' }, { horario: '18:30' }
+    ]);
+  }
 }
 
 // --- ROTAS DA API ---
 
-// 1. Buscar Setores e Horários para os Dropdowns
-app.get('/api/auxiliares', (req, res) => {
-  db.all(`SELECT * FROM setores ORDER BY nome ASC`, [], (err, setores) => {
-    if (err) return res.status(500).json({ erro: err.message });
-    db.all(`SELECT * FROM horarios ORDER BY horario ASC`, [], (err, horarios) => {
-      if (err) return res.status(500).json({ erro: err.message });
-      res.json({ setores, horarios });
+app.get('/api/auxiliares', async (req, res) => {
+  try {
+    const setores = await Setor.find().sort({ nome: 1 }).lean();
+    const horarios = await Horario.find().sort({ horario: 1 }).lean();
+    // Transforma _id em id para o frontend entender
+    res.json({
+      setores: setores.map(s => ({ id: s._id, nome: s.nome })),
+      horarios: horarios.map(h => ({ id: h._id, horario: h.horario }))
     });
-  });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// 2. Buscar Cardápio do Dia
-app.get('/api/cardapio/:dia', (req, res) => {
-  const { dia } = req.params;
-  db.get(`SELECT * FROM cardapios WHERE dia_semana = ?`, [dia], (err, row) => {
-    if (err) return res.status(500).json({ erro: err.message });
-    res.json(row || { mistura_a: 'Opção A', mistura_b: 'Opção B' });
-  });
+app.get('/api/cardapio/:dia', async (req, res) => {
+  try {
+    const cardapio = await Cardapio.findOne({ dia_semana: req.params.dia });
+    res.json(cardapio || { mistura_a: 'Opção A', mistura_b: 'Opção B' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// 3. Salvar/Atualizar Cardápio (Admin)
-app.post('/api/cardapio', (req, res) => {
-  const { dia_semana, mistura_a, mistura_b } = req.body;
-  const sql = `INSERT INTO cardapios (dia_semana, mistura_a, mistura_b) 
-               VALUES (?, ?, ?) 
-               ON CONFLICT(dia_semana) DO UPDATE SET mistura_a = ?, mistura_b = ?`;
-  db.run(sql, [dia_semana, mistura_a, mistura_b, mistura_a, mistura_b], function(err) {
-    if (err) return res.status(500).json({ erro: err.message });
+app.post('/api/cardapio', async (req, res) => {
+  try {
+    const { dia_semana, mistura_a, mistura_b } = req.body;
+    await Cardapio.findOneAndUpdate(
+      { dia_semana },
+      { mistura_a, mistura_b },
+      { upsert: true, new: true }
+    );
     res.json({ sucesso: true });
-  });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// 4. Limpar Cardápio do Dia (Admin)
-app.delete('/api/cardapio/:dia', (req, res) => {
-  const { dia } = req.params;
-  db.run(`DELETE FROM cardapios WHERE dia_semana = ?`, [dia], function(err) {
-    if (err) return res.status(500).json({ erro: err.message });
+app.delete('/api/cardapio/:dia', async (req, res) => {
+  try {
+    await Cardapio.findOneAndDelete({ dia_semana: req.params.dia });
     res.json({ sucesso: true });
-  });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// 5. Salvar Escolha do Colaborador
-app.post('/api/escolhas', (req, res) => {
-  const { dia_semana, nome_colaborador, setor_id, horario_id, opcao_mistura } = req.body;
-  const dataHoje = new Date().toISOString().split('T')[0];
-
-  const sql = `INSERT INTO escolhas (data, dia_semana, nome_colaborador, setor_id, horario_id, opcao_mistura)
-               VALUES (?, ?, ?, ?, ?, ?)`;
-  db.run(sql, [dataHoje, dia_semana, nome_colaborador, setor_id, horario_id, opcao_mistura], function(err) {
-    if (err) return res.status(500).json({ erro: err.message });
-    res.json({ sucesso: true, id: this.lastID });
-  });
+app.post('/api/escolhas', async (req, res) => {
+  try {
+    const { dia_semana, nome_colaborador, setor_id, horario_id, opcao_mistura } = req.body;
+    const dataHoje = new Date().toISOString().split('T')[0];
+    
+    const novaEscolha = await Escolha.create({
+      data: dataHoje, dia_semana, nome_colaborador, setor_id, horario_id, opcao_mistura
+    });
+    res.json({ sucesso: true, id: novaEscolha._id });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// 6. Relatório Ordenado (Admin) - Separa por Horário e Nome A-Z
-app.get('/api/relatorio/:dia', (req, res) => {
-  const { dia } = req.params;
-  const sql = `
-    SELECT 
-      e.id,
-      e.nome_colaborador,
-      e.opcao_mistura,
-      s.nome AS setor,
-      h.horario
-    FROM escolhas e
-    JOIN setores s ON e.setor_id = s.id
-    JOIN horarios h ON e.horario_id = h.id
-    WHERE e.dia_semana = ?
-    ORDER BY h.horario ASC, e.nome_colaborador ASC
-  `;
-  db.all(sql, [dia], (err, rows) => {
-    if (err) return res.status(500).json({ erro: err.message });
-    res.json(rows);
-  });
+app.get('/api/relatorio/:dia', async (req, res) => {
+  try {
+    const escolhas = await Escolha.find({ dia_semana: req.params.dia })
+      .populate('setor_id')
+      .populate('horario_id')
+      .lean();
+
+    const formatado = escolhas.map(e => ({
+      id: e._id,
+      nome_colaborador: e.nome_colaborador,
+      opcao_mistura: e.opcao_mistura,
+      setor: e.setor_id ? e.setor_id.nome : 'Sem setor',
+      horario: e.horario_id ? e.horario_id.horario : 'Sem horário'
+    }));
+
+    // Ordena por horário e depois por nome
+    formatado.sort((a, b) => {
+      if (a.horario === b.horario) return a.nome_colaborador.localeCompare(b.nome_colaborador);
+      return a.horario.localeCompare(b.horario);
+    });
+
+    res.json(formatado);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-//Limpar todos os registros de colaboradores de um dia específico 
-app.delete('/api/relatorio/:dia', (req, res) => {
-  const { dia } = req.params;
-  
-  // Apaga as escolhas daquele dia específico
-  db.run(`DELETE FROM escolhas WHERE dia_semana = ?`, [dia], function(err) {
-    if (err) return res.status(500).json({ erro: err.message });
-    res.json({ sucesso: true, apagados: this.changes });
-  });
+app.delete('/api/relatorio/:dia', async (req, res) => {
+  try {
+    const result = await Escolha.deleteMany({ dia_semana: req.params.dia });
+    res.json({ sucesso: true, apagados: result.deletedCount });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
